@@ -10,7 +10,7 @@ from scrapy import Request
 from panjueshu.items import CaseItem
 
 class ListSpider(scrapy.Spider):
-    name = 'list'
+    name = 'case'
     allowed_domains = ['panjueshu.com']
     base_url = 'http://api.panjueshu.com/Verdict/GetCaseDetails'
     custom_settings = {
