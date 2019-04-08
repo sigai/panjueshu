@@ -11,7 +11,7 @@ from panjueshu.items import CaseItem
 
 class ListSpider(scrapy.Spider):
     name = 'case'
-    allowed_domains = ['panjueshu.com']
+    allowed_domains = ['api.panjueshu.com']
     base_url = 'http://api.panjueshu.com/Verdict/GetCaseDetails'
     custom_settings = {
         "RETRY_ENABLED": False,
@@ -31,11 +31,15 @@ class ListSpider(scrapy.Spider):
     r = Redis(connection_pool=pool)
 
     def start_requests(self):
-        for i in range(0, 23934152, -1):
-            ctime = str(round(time()), encoding="utf-8")
-            code = self._sig(ctime)
+        # for i in range(23934152, 0, -1):
+        # for i in range(23934152, 24000000):
+        for i in range(0, 23934152):
+            if self.r.sismember("panjueshu:crawled", str(i)):
+                continue
+            ctime = round(time())
+            code = self._sig(t=ctime)
             parameters = {
-                "caseid": i,
+                "caseid": str(i),
                 "code": code,
                 "time": ctime,
             }
@@ -44,7 +48,6 @@ class ListSpider(scrapy.Spider):
                 method="POST", 
                 body=urlencode(parameters)
                 )
-            break
 
     def parse(self, response):
         res = json.loads(response.body_as_unicode())
@@ -55,7 +58,7 @@ class ListSpider(scrapy.Spider):
 
     @staticmethod
     def _sig(t, s='panjueshu.com'):
-        st = str(t, encoding="utf-8")
+        st = str(t)
         sig_str = st[2:] + st[0:2] + s
         m = hashlib.md5()
         m.update(bytes(sig_str, encoding="utf-8"))
