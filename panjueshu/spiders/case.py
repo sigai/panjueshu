@@ -16,6 +16,7 @@ class ListSpider(scrapy.Spider):
     custom_settings = {
         "RETRY_ENABLED": False,
         "LOG_LEVEL": "INFO",
+        "DOWNLOAD_FAIL_ON_DATALOSS": False,
         "DEFAULT_REQUEST_HEADERS": {
             'Charset': 'UTF-8',
             'User-Agent': 'Dalvik/2.1.0 (Linux; U; Android 5.1.1; ONEPLUS A5000 Build/LMY48Z)',
@@ -25,16 +26,26 @@ class ListSpider(scrapy.Spider):
         },
         "ITEM_PIPELINES": {
             "panjueshu.pipelines.PanjueshuPipeline": 300
+        },
+        "DOWNLOADER_MIDDLEWARES": {
+            "panjueshu.middlewares.PanjueshuDownloaderMiddleware": 543
         }
     }
     pool = ConnectionPool()
     r = Redis(connection_pool=pool)
 
     def start_requests(self):
-        # for i in range(23934152, 0, -1):
-        # for i in range(23934152, 24000000):
-        for i in range(0, 23934152):
+        # New
+        # for i in range(24089458, 25000000):
+        # Middle
+        # for i in range(23400958, 0, -1):
+        # Old
+        # for i in range(511510, 23934152):
+        # extentions
+        for i in range(10000000, 20000000):
+        # for i in range(20000000, 30000000):
             if self.r.sismember("panjueshu:crawled", str(i)):
+                self.logger.info(i)
                 continue
             ctime = round(time())
             code = self._sig(t=ctime)
@@ -50,11 +61,15 @@ class ListSpider(scrapy.Spider):
                 )
 
     def parse(self, response):
-        res = json.loads(response.body_as_unicode())
-        code = res["Result"]
-        if "200" == code:
-            case = res["Details"]
-            yield CaseItem(case=case)
+        try:
+            res = json.loads(response.body_as_unicode())
+        except Exception:
+            Ellipsis
+        else:
+            code = res["Result"]
+            if "200" == code:
+                case = res["Details"]
+                yield CaseItem(case=case)
 
     @staticmethod
     def _sig(t, s='panjueshu.com'):

@@ -6,6 +6,9 @@
 # https://doc.scrapy.org/en/latest/topics/spider-middleware.html
 
 from scrapy import signals
+from scrapy.exceptions import IgnoreRequest
+from twisted.web._newclient import ResponseFailed, ResponseNeverReceived
+from twisted.internet.error import ConnectionLost
 
 
 class PanjueshuSpiderMiddleware(object):
@@ -97,7 +100,10 @@ class PanjueshuDownloaderMiddleware(object):
         # - return None: continue processing this exception
         # - return a Response object: stops process_exception() chain
         # - return a Request object: stops process_exception() chain
-        pass
+        if isinstance(exception, (ResponseFailed, ResponseNeverReceived, ConnectionLost)):
+            raise IgnoreRequest()
+        else:
+            return None
 
     def spider_opened(self, spider):
         spider.logger.info('Spider opened: %s' % spider.name)
