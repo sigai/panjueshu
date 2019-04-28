@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import hashlib
-from time import time
+from time import time, sleep
 from urllib.parse import urlencode
 import json
 
@@ -35,30 +35,23 @@ class ListSpider(scrapy.Spider):
     r = Redis(connection_pool=pool)
 
     def start_requests(self):
-        # New
-        # for i in range(24089458, 25000000):
-        # Middle
-        # for i in range(23400958, 0, -1):
-        # Old
-        # for i in range(511510, 23934152):
-        # extentions
-        for i in range(10000000, 20000000):
-        # for i in range(20000000, 30000000):
-            if self.r.sismember("panjueshu:crawled", str(i)):
-                self.logger.info(i)
-                continue
-            ctime = round(time())
-            code = self._sig(t=ctime)
-            parameters = {
-                "caseid": str(i),
-                "code": code,
-                "time": ctime,
-            }
-            yield Request(
-                url=self.base_url, 
-                method="POST", 
-                body=urlencode(parameters)
-                )
+        while True:
+            for i in range(24388205, 25000000):
+                if self.r.sismember("panjueshu:crawled", str(i)):
+                    self.logger.info(i)
+                    continue
+                ctime = round(time())
+                code = self._sig(t=ctime)
+                parameters = {
+                    "caseid": str(i),
+                    "code": code,
+                    "time": ctime,
+                }
+                yield Request(
+                    url=self.base_url, 
+                    method="POST", 
+                    body=urlencode(parameters)
+                    )
 
     def parse(self, response):
         try:

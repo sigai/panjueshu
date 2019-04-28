@@ -8,7 +8,7 @@
 from scrapy import signals
 from scrapy.exceptions import IgnoreRequest
 from twisted.web._newclient import ResponseFailed, ResponseNeverReceived
-from twisted.internet.error import ConnectionLost
+from twisted.internet.error import ConnectionLost, TimeoutError
 
 
 class PanjueshuSpiderMiddleware(object):
@@ -100,7 +100,7 @@ class PanjueshuDownloaderMiddleware(object):
         # - return None: continue processing this exception
         # - return a Response object: stops process_exception() chain
         # - return a Request object: stops process_exception() chain
-        if isinstance(exception, (ResponseFailed, ResponseNeverReceived, ConnectionLost)):
+        if isinstance(exception, (ResponseFailed, ResponseNeverReceived, ConnectionLost, TimeoutError)):
             raise IgnoreRequest()
         else:
             return None

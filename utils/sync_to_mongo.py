@@ -26,7 +26,13 @@ def load():
             print(e)
             r.sadd("panjueshu:case", item)
 
+def gen_ids():
+    for i in range(1, 24299222):
+        if r.sismember("panjueshu:crawled", str(i)):
+            continue
+        else:
+            r.sadd("panjueshu:start", str(i))
 
 if __name__ == '__main__':
-    load()
+    gen_ids()
     
