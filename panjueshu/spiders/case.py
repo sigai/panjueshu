@@ -36,7 +36,7 @@ class ListSpider(scrapy.Spider):
 
     def start_requests(self):
         while True:
-            for i in range(24388205, 25000000):
+            for i in range(24844499, 25000000):
                 if self.r.sismember("panjueshu:crawled", str(i)):
                     self.logger.info(i)
                     continue
